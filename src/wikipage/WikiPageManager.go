@@ -1,7 +1,7 @@
-package WikiPage
+package wikipage
 
 import (
-	"github.com/marcochilese/negawordfixer/src/Utils"
+	"github.com/marcochilese/negawordfixer/src/utils"
 	"strings"
 )
 

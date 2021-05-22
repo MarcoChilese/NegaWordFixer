@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/marcochilese/negawordfixer/src/FsUtils"
-	"github.com/marcochilese/negawordfixer/src/Processing"
+	"github.com/marcochilese/negawordfixer/src/fsUtils"
+	"github.com/marcochilese/negawordfixer/src/processing"
 	"flag"
 	"fmt"
 	"github.com/marcochilese/Go-Trie"
@@ -44,7 +44,7 @@ func main() {
 	filesToProcess := FsUtils.GetFilesList(tmpDir, false)
 
 	fmt.Fprintln(logger,"To process: ", len(filesToProcess))
-	fmt.Fprintln(logger,"Processing start")
+	fmt.Fprintln(logger,"processing start")
 	for _, file := range filesToProcess {
 		err := Processing.ProcessPage(file, *mytrie, replacementDict, &logger)
 		if err != nil {
@@ -52,7 +52,7 @@ func main() {
 		}
 
 	}
-	fmt.Fprintln(logger,"Processing end.")
+	fmt.Fprintln(logger,"processing end.")
 	fmt.Fprintln(logger,"Compression start")
 	err = FsUtils.CompressTarGz(tmpDir, "test_data/FIXED_core-2020-01-24-negapedia-en.tar.gz")
 	if err != nil {

@@ -1,4 +1,4 @@
-package FsUtils
+package fsutils
 
 import (
 	"archive/tar"

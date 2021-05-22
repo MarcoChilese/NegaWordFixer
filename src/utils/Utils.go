@@ -1,4 +1,4 @@
-package Utils
+package utils
 
 type VarCouple struct {
 	Word, Value string
