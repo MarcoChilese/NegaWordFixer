@@ -54,7 +54,7 @@ func main() {
 	}
 	fmt.Fprintln(logger,"processing end.")
 	fmt.Fprintln(logger,"Compression start")
-	err = fsutils.CompressTarGz(tmpDir, "FIXED.tar.gz")
+	err = fsutils.CompressTarGz(tmpDir, "./out/FIXED.tar.gz")
 	if err != nil {
 		fmt.Fprintln(logger,err)
 	}
