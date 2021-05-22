@@ -10,7 +10,7 @@ import (
 	"strings"
 )
 
-func PerformoCorrection(jsMap *[]Utils.VarCouple, trie trie.Trie, replacementDict *map[string]string, logger *io.Writer) {
+func PerformoCorrection(jsMap *[]utils.VarCouple, trie trie.Trie, replacementDict *map[string]string, logger *io.Writer) {
 	for i, _ := range *jsMap {
 		fmt.Fprint(*logger, (*jsMap)[i].Word + " replaced by ")
 
@@ -50,13 +50,13 @@ func replaceJSVariable(pageData string, variableName string, trie trie.Trie, rep
 	startIdx := strings.Index(pageData, variableName)
 	endIdx := strings.Index(pageData[startIdx:], "])") + 1
 
-	varMapData := WikiPage.ParseJSMap(pageData[startIdx : startIdx+endIdx])
+	varMapData := wikipage.ParseJSMap(pageData[startIdx : startIdx+endIdx])
 
 	// deal with dictionary_data and do the words correction
 	// call here
 	PerformoCorrection(varMapData, trie, replacementDict, logger)
 
-	newJsMap := WikiPage.GetJSMapFromSlice(varMapData, variableName) // get back JS map format
+	newJsMap := wikipage.GetJSMapFromSlice(varMapData, variableName) // get back JS map format
 
 	// do the replacement in pageData[startIdx:startIdx+endIdx]
 	//newJsMap = "x = new Map([[\"PROVA\", 1234]])"
@@ -68,23 +68,23 @@ func replaceJSVariable(pageData string, variableName string, trie trie.Trie, rep
 }
 
 func ProcessPage(gzPagePath string, trie trie.Trie, replacementDict *map[string]string, logger *io.Writer) error {
-	data, err := FsUtils.ReadGzPage(gzPagePath)
+	data, err := fsutils.ReadGzPage(gzPagePath)
 	if err != nil {
 		return err
 	}
-	data, err = replaceJSVariable(data, WikiPage.NegaJSVariables().Tfidf, trie, replacementDict, logger)
+	data, err = replaceJSVariable(data, wikipage.NegaJSVariables().Tfidf, trie, replacementDict, logger)
 	if err != nil {
 		return err
 	}
-	data, err = replaceJSVariable(data, WikiPage.NegaJSVariables().Badw, trie, replacementDict, logger)
+	data, err = replaceJSVariable(data, wikipage.NegaJSVariables().Badw, trie, replacementDict, logger)
 	if err != nil {
 		return err
 	}
-	data, err = replaceJSVariable(data, WikiPage.NegaJSVariables().Word2Occur, trie, replacementDict, logger)
+	data, err = replaceJSVariable(data, wikipage.NegaJSVariables().Word2Occur, trie, replacementDict, logger)
 	if err != nil {
 		return err
 	}
-	err = FsUtils.WriteGzPage(gzPagePath, data)
+	err = fsutils.WriteGzPage(gzPagePath, data)
 	if err != nil {
 		return err
 	}

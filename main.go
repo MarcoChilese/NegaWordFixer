@@ -1,11 +1,11 @@
 package main
 
 import (
-	"github.com/marcochilese/negawordfixer/src/fsutils"
-	"github.com/marcochilese/negawordfixer/src/processing"
 	"flag"
 	"fmt"
 	"github.com/marcochilese/Go-Trie"
+	"github.com/marcochilese/negawordfixer/src/fsutils"
+	"github.com/marcochilese/negawordfixer/src/processing"
 	"io/ioutil"
 	"os"
 )
@@ -36,17 +36,17 @@ func main() {
 
 	mytrie, replacementDict := buildTrieAndReplacementDict(*pathToDictPtr)
 
-	tmpDir, err := FsUtils.ExtractTarGz(*tarPathPtr)
+	tmpDir, err := fsutils.ExtractTarGz(*tarPathPtr)
 	if err != nil {
 		fmt.Fprintln(logger,err)
 	}
 
-	filesToProcess := FsUtils.GetFilesList(tmpDir, false)
+	filesToProcess := fsutils.GetFilesList(tmpDir, false)
 
 	fmt.Fprintln(logger,"To process: ", len(filesToProcess))
 	fmt.Fprintln(logger,"processing start")
 	for _, file := range filesToProcess {
-		err := Processing.ProcessPage(file, *mytrie, replacementDict, &logger)
+		err := processing.ProcessPage(file, *mytrie, replacementDict, &logger)
 		if err != nil {
 			os.RemoveAll(tmpDir)
 		}
@@ -54,7 +54,7 @@ func main() {
 	}
 	fmt.Fprintln(logger,"processing end.")
 	fmt.Fprintln(logger,"Compression start")
-	err = FsUtils.CompressTarGz(tmpDir, "test_data/FIXED_core-2020-01-24-negapedia-en.tar.gz")
+	err = fsutils.CompressTarGz(tmpDir, "test_data/FIXED_core-2020-01-24-negapedia-en.tar.gz")
 	if err != nil {
 		fmt.Fprintln(logger,err)
 	}

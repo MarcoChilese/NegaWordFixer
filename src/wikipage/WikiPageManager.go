@@ -19,12 +19,12 @@ func NegaJSVariables() JSVariables {
 	}
 }
 
-func ParseJSMap(jsmap string) *[]Utils.VarCouple {
+func ParseJSMap(jsmap string) *[]utils.VarCouple {
 	/**
 	Returns a slice made like [(word, value), ...] from a variable formatted like:
 		Word2TFIDF = new Map([[\"2015\",  0.0047 ], ... ,])"
 	*/
-	var variable []Utils.VarCouple
+	var variable []utils.VarCouple
 
 	mapStart := strings.Index(jsmap, "Map([") + 5
 	values := strings.Split(jsmap[mapStart:], "],")
@@ -35,13 +35,13 @@ func ParseJSMap(jsmap string) *[]Utils.VarCouple {
 		}
 		fields := strings.Split(keyvalue, ",")
 
-		variable = append(variable, Utils.VarCouple{Word: strings.ToLower(fields[0][2:len(fields[0])-1]), Value: fields[1]})
+		variable = append(variable, utils.VarCouple{Word: strings.ToLower(fields[0][2:len(fields[0])-1]), Value: fields[1]})
 	}
 
 	return &variable
 }
 
-func GetJSMapFromSlice(dataSlice *[]Utils.VarCouple, varName string) (newVar string) {
+func GetJSMapFromSlice(dataSlice *[]utils.VarCouple, varName string) (newVar string) {
 	newVar = varName + " = new Map(["
 
 	for _, couple := range *dataSlice {
