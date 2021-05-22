@@ -1,7 +1,7 @@
 package WikiPage
 
 import (
-	"github.com/marcochilese/NegaWordFixer/Utils"
+	"github.com/marcochilese/NegaWordFixer/src/Utils"
 	"strings"
 )
 

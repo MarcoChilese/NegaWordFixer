@@ -1,9 +1,9 @@
 package Processing
 
 import (
-	"github.com/marcochilese/NegaWordFixer/FsUtils"
-	"github.com/marcochilese/NegaWordFixer/Utils"
-	"github.com/marcochilese/NegaWordFixer/WikiPage"
+	"github.com/marcochilese/NegaWordFixer/src/FsUtils"
+	"github.com/marcochilese/NegaWordFixer/src/Utils"
+	"github.com/marcochilese/NegaWordFixer/src/WikiPage"
 	"fmt"
 	trie "github.com/marcochilese/Go-Trie"
 	"io"

@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/marcochilese/NegaWordFixer/FsUtils"
-	"github.com/marcochilese/NegaWordFixer/Processing"
+	"github.com/marcochilese/NegaWordFixer/src/FsUtils"
+	"github.com/marcochilese/NegaWordFixer/src/Processing"
 	"flag"
 	"fmt"
 	"github.com/marcochilese/Go-Trie"
