@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/marcochilese/negawordfixer/src/fsUtils"
+	"github.com/marcochilese/negawordfixer/src/fsutils"
 	"github.com/marcochilese/negawordfixer/src/processing"
 	"flag"
 	"fmt"
