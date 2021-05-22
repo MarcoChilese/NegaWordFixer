@@ -1,8 +1,8 @@
 package main
 
 import (
-	"./FsUtils"
-	"./Processing"
+	"github.com/marcochilese/NegaWordFixer/FsUtils"
+	"github.com/marcochilese/NegaWordFixer/Processing"
 	"flag"
 	"fmt"
 	"github.com/marcochilese/Go-Trie"
