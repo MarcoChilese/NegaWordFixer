@@ -23,7 +23,7 @@ func buildTrieAndReplacementDict(pathToDict string) (*trie.Trie, *map[string]str
 func main() {
 
 	pathToDictPtr := flag.String("dict", "./dictionary_data/en.txt", "Path to language dictionary")
-	tarPathPtr := flag.String("tar", "test_data/core-2020-01-24-negapedia-en.tar.gz", "Path to negapedia-LANG.tar.gz")
+	tarPathPtr := flag.String("tar", "./test_data/core-2020-01-24-negapedia-en.tar.gz", "Path to negapedia-LANG.tar.gz")
 	langPtr := flag.String("lang", "en", "Negapedia language")
 	verbosePtr := flag.Bool("verbose", false, "Negapedia language")
 
@@ -54,7 +54,7 @@ func main() {
 	}
 	fmt.Fprintln(logger,"processing end.")
 	fmt.Fprintln(logger,"Compression start")
-	err = fsutils.CompressTarGz(tmpDir, "test_data/FIXED_core-2020-01-24-negapedia-en.tar.gz")
+	err = fsutils.CompressTarGz(tmpDir, "FIXED.tar.gz")
 	if err != nil {
 		fmt.Fprintln(logger,err)
 	}
