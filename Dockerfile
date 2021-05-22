@@ -1,0 +1,14 @@
+FROM golang:latest
+
+ENV PROJECT github.com/marcochilese/negawordfixer
+ENV GO111MODULE=off
+
+ADD . $GOPATH/src/$PROJECT
+RUN go get $PROJECT/...;
+RUN cd $GOPATH/src/$PROJECT/ && go build -o main && mv main /main
+RUN cp -r $GOPATH/src/$PROJECT/dictionary_data /
+RUN cp -r $GOPATH/src/$PROJECT/test_data /
+
+WORKDIR /
+# Run the executable
+ENTRYPOINT ["./main"]
