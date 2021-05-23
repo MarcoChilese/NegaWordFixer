@@ -9,6 +9,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path"
+	"strings"
 	"time"
 )
 
@@ -31,6 +32,9 @@ func getNewestFileInDir(dir string) string {
 	var newestTime int64 = 0
 	for _, f := range files {
 		if f.Name() == ".DS_Store" {
+			continue
+		}
+		if !strings.Contains(f.Name(), "tar.gz"){
 			continue
 		}
 		fi, err := os.Stat(dir + f.Name())
