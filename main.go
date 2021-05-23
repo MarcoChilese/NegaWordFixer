@@ -8,6 +8,7 @@ import (
 	"github.com/marcochilese/negawordfixer/src/processing"
 	"io/ioutil"
 	"os"
+	"path"
 )
 
 func buildTrieAndReplacementDict(pathToDict string) (*trie.Trie, *map[string]string){
@@ -19,26 +20,57 @@ func buildTrieAndReplacementDict(pathToDict string) (*trie.Trie, *map[string]str
 	return mytrie, &replacementDict
 }
 
+func getNewestFileInDir(dir string) string {
+	if dir[len(dir)-1] != "/"[0] {
+		dir += "/"
+	}
+
+	files, _ := ioutil.ReadDir(dir)
+	var newestFile string
+	var newestTime int64 = 0
+	for _, f := range files {
+		if f.Name() == ".DS_Store"{
+			continue
+		}
+		fi, err := os.Stat(dir + f.Name())
+		if err != nil {
+			fmt.Println(err)
+		}
+		currTime := fi.ModTime().Unix()
+		if currTime > newestTime {
+			newestTime = currTime
+			newestFile = f.Name()
+		}
+	}
+	return path.Join(dir, newestFile)
+}
+
 
 func main() {
 
-	pathToDictPtr := flag.String("dict", "./dictionary_data/en.txt", "Path to language dictionary")
-	tarPathPtr := flag.String("tar", "./test_data/core-2020-01-24-negapedia-en.tar.gz", "Path to negapedia-LANG.tar.gz")
+	//pathToDict := flag.String("dict", "./dictionary_data/en.txt", "Path to language dictionary")
+	tarPathPtr := flag.String("tar", "", "Path to negapedia-LANG.tar.gz")
 	langPtr := flag.String("lang", "en", "Negapedia language")
 	verbosePtr := flag.Bool("verbose", false, "Negapedia language")
+	flag.Parse()
+
+	*tarPathPtr = getNewestFileInDir(*tarPathPtr)
+	pathToDict := path.Join("./dictionary_data/", *langPtr+".txt")
 
 	logger := ioutil.Discard
 	if *verbosePtr {
 		logger = os.Stdout
 	}
 	
-	fmt.Fprintln(logger, "Run with config:\n\tLang: %s\n\tDict: %s\n\tTar: %s\n\t", *langPtr, *pathToDictPtr, *tarPathPtr)
+	fmt.Println("Run with config:\n\tLang: "+*langPtr+
+		"\n\tDict: "+pathToDict+
+		"\n\tTar: "+*tarPathPtr+"\n\t")
 
-	mytrie, replacementDict := buildTrieAndReplacementDict(*pathToDictPtr)
+	mytrie, replacementDict := buildTrieAndReplacementDict(pathToDict)
 
 	tmpDir, err := fsutils.ExtractTarGz(*tarPathPtr)
 	if err != nil {
-		fmt.Fprintln(logger,err)
+		fmt.Println(err)
 	}
 
 	filesToProcess := fsutils.GetFilesList(tmpDir, false)
@@ -54,9 +86,10 @@ func main() {
 	}
 	fmt.Fprintln(logger,"processing end.")
 	fmt.Fprintln(logger,"Compression start")
-	err = fsutils.CompressTarGz(tmpDir, "./out/FIXED.tar.gz")
+	os.Mkdir("out", 0755)
+	err = fsutils.CompressTarGz(tmpDir, path.Join(*tarPathPtr))
 	if err != nil {
-		fmt.Fprintln(logger,err)
+		fmt.Println(err)
 	}
 	os.RemoveAll(tmpDir)
 	fmt.Fprintln(logger,"Compression end.")
