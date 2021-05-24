@@ -75,7 +75,7 @@ func ExtractTarGz(tarpath string) (string, error) {
 
 func ExtractTarGz2(tarpath string) (string, error) {
 	tmpdir := "tmp"
-	//os.RemoveAll(tmpdir)
+	os.RemoveAll(tmpdir)
 
 	err := os.Mkdir(tmpdir, 0755)
 	if err != nil {
