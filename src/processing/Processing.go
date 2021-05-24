@@ -7,7 +7,6 @@ import (
 	"github.com/negapedia/negawordfixer/src/utils"
 	"github.com/negapedia/negawordfixer/src/wikipage"
 	"io"
-	"os"
 	"strings"
 )
 
@@ -72,7 +71,7 @@ func replaceJSVariable(pageData string, variableName string, trie trie.Trie, rep
 
 func ProcessPage(gzPagePath string, trie trie.Trie, replacementDict *map[string]string, logger *io.Writer) error {
 	data, err := fsutils.ReadGzPage(gzPagePath)
-	fmt.Fprintf(os.Stdout,"%s ", len(data))
+	fmt.Println(len(data))
 
 	if err != nil {
 		return err
@@ -89,8 +88,6 @@ func ProcessPage(gzPagePath string, trie trie.Trie, replacementDict *map[string]
 	if err != nil {
 		return err
 	}
-
-	fmt.Fprintf(os.Stdout,"%s ", len(data))
 	err = fsutils.WriteGzPage(gzPagePath, data)
 	if err != nil {
 		return err
