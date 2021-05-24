@@ -239,7 +239,13 @@ func WriteGzPage(tarPath string, data string) error {
 		return err
 	}
 
-	writer.Close()
-	newGz.Close()
-	return nil
+	err = writer.Close()
+	if err != nil {
+		return err
+	}
+	err = newGz.Close()
+	if err != nil {
+		return err
+	}
+	return err
 }

@@ -11,6 +11,7 @@ import (
 	"log"
 	"os"
 	"path"
+	"strings"
 	"time"
 )
 
@@ -35,9 +36,9 @@ func getNewestFileInDir(dir string) string {
 		if f.Name() == ".DS_Store" {
 			continue
 		}
-		/*if !strings.Contains(f.Name(), "tar.gz"){
+		if !strings.Contains(f.Name(), "tar.gz") {
 			continue
-		}*/
+		}
 		fi, err := os.Stat(dir + f.Name())
 		if err != nil {
 			fmt.Println(err)
@@ -68,16 +69,30 @@ func languageChecker(lang string) (string, error) {
 }
 
 func main() {
-	tarPathPtr := flag.String("tar", "./out", "Path to negapedia-LANG.tar.gz")
 	langPtr := flag.String("lang", "en", "Negapedia language")
 	verbosePtr := flag.Bool("verbose", false, "Negapedia language")
+	exactFilePtr := flag.String("file", "", "Exact tar.gz to process. If not specified is automatically selected the newest .tar.gz")
+	outFilenamePtr := flag.String("out", "", "Name of the tar.gz output file")
 	flag.Parse()
 
 	dictLang, err := languageChecker(*langPtr)
 	if err != nil {
 		log.Fatal(err)
 	}
-	*tarPathPtr = getNewestFileInDir(*tarPathPtr)
+	tarPathPtr := "./out"
+	if *exactFilePtr != "" {
+		tarPathPtr = path.Join("./out", *exactFilePtr)
+	} else {
+		tarPathPtr = getNewestFileInDir(tarPathPtr)
+	}
+
+	if *outFilenamePtr == "" {
+		name := "fixed-"+path.Base(tarPathPtr)
+		*outFilenamePtr = path.Join("./out", name)
+	} else {
+		*outFilenamePtr = path.Join("./out", *outFilenamePtr)
+	}
+
 	pathToDict := path.Join("./dictionary_data/", dictLang+".txt")
 
 	logger := ioutil.Discard
@@ -88,13 +103,13 @@ func main() {
 	fmt.Println("--- NegaWordsFixer ---")
 	fmt.Println("Run with config:\n\tLang: " + *langPtr +
 		"\n\tDict: " + pathToDict +
-		"\n\tTar: " + *tarPathPtr + "\n\t")
+		"\n\tTar: " + tarPathPtr + "\n\t")
 
 	mytrie, replacementDict := buildTrieAndReplacementDict(pathToDict)
 
 	fmt.Println("Extraction start")
 	start := time.Now()
-	tmpDir, err := fsutils.ExtractTarGz2(*tarPathPtr)
+	tmpDir, err := fsutils.ExtractTarGz2(tarPathPtr)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -116,7 +131,7 @@ func main() {
 
 	fmt.Fprintln(logger, "Compression start")
 	start = time.Now()
-	err = fsutils.CompressTarGz2(*tarPathPtr, tmpDir)
+	err = fsutils.CompressTarGz2(*outFilenamePtr, path.Join(tmpDir, "html"))
 	if err != nil {
 		fmt.Println(err)
 	}
