@@ -11,16 +11,15 @@ import (
 	"log"
 	"os"
 	"path"
-	"sync"
 	"time"
 )
 
-func buildTrieAndReplacementDict(pathToDict string) (*trie.Trie, *sync.Map) {
+func buildTrieAndReplacementDict(pathToDict string) (*trie.Trie, *map[string]string) {
 	mytrie := trie.BuildTrieFromDictionary(pathToDict)
 
 	// in replacementDict are stored all the replacements in order to
 	// speedup the replacement process when stored enough history
-	var replacementDict sync.Map
+	replacementDict := make(map[string]string)
 	return mytrie, &replacementDict
 }
 
@@ -107,12 +106,12 @@ func main() {
 	fmt.Println("Processing start")
 	start = time.Now()
 
-	wg := sync.WaitGroup{}
-	wg.Add(len(filesToProcess))
 	for _, file := range filesToProcess {
-		go processing.ProcessPage(file, *mytrie, replacementDict, &logger, &wg)
+		err := processing.ProcessPage(file, *mytrie, replacementDict, &logger)
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
-	wg.Wait()
 	fmt.Println("Processing done in ", time.Now().Sub(start))
 
 	fmt.Fprintln(logger, "Compression start")

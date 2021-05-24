@@ -1,24 +1,22 @@
 package processing
 
 import (
+	"fmt"
+	trie "github.com/marcochilese/Go-Trie"
 	"github.com/negapedia/negawordfixer/src/fsutils"
 	"github.com/negapedia/negawordfixer/src/utils"
 	"github.com/negapedia/negawordfixer/src/wikipage"
-	"fmt"
-	trie "github.com/marcochilese/Go-Trie"
 	"io"
 	"strings"
-	"sync"
 )
 
-func PerformCorrection(jsMap *[]utils.VarCouple, trie trie.Trie, replacementDict *sync.Map, logger *io.Writer) {
+func PerformCorrection(jsMap *[]utils.VarCouple, trie trie.Trie, replacementDict *map[string]string, logger *io.Writer) {
 	for i, _ := range *jsMap {
-		fmt.Fprint(*logger, (*jsMap)[i].Word + " replaced by ")
+		fmt.Fprint(*logger, (*jsMap)[i].Word+" replaced by ")
 
-		res, exists := (*replacementDict).Load((*jsMap)[i].Word)
+		newWord, exists := (*replacementDict)[(*jsMap)[i].Word]
 
 		if exists { // if the replacement is already known, then use it and avoid the search on the trie
-			newWord := res.(string)
 			if newWord == (*jsMap)[i].Word {
 				fmt.Fprintln(*logger, "--SAME--")
 			} else {
@@ -41,12 +39,12 @@ func PerformCorrection(jsMap *[]utils.VarCouple, trie trie.Trie, replacementDict
 				(*jsMap)[i].Word = alternatives[0] // it will be in position 0 since the alternatives are ordered by length
 				fmt.Fprintln(*logger, (*jsMap)[i].Word)
 			}
-			(*replacementDict).Store(oldWord, alternatives[0]) // store the replacement for the future
+			(*replacementDict)[oldWord] = alternatives[0] // store the replacement for the future
 		}
 	}
 }
 
-func replaceJSVariable(pageData string, variableName string, trie trie.Trie, replacementDict *sync.Map, logger *io.Writer) (string, error) {
+func replaceJSVariable(pageData string, variableName string, trie trie.Trie, replacementDict *map[string]string, logger *io.Writer) (string, error) {
 	if !strings.Contains(pageData, variableName) {
 		return pageData, nil
 	}
@@ -71,7 +69,7 @@ func replaceJSVariable(pageData string, variableName string, trie trie.Trie, rep
 	return pageData, nil
 }
 
-func ProcessPage(gzPagePath string, trie trie.Trie, replacementDict *sync.Map, logger *io.Writer, wg *sync.WaitGroup) error {
+func ProcessPage(gzPagePath string, trie trie.Trie, replacementDict *map[string]string, logger *io.Writer) error {
 	data, err := fsutils.ReadGzPage(gzPagePath)
 	if err != nil {
 		return err
@@ -90,10 +88,8 @@ func ProcessPage(gzPagePath string, trie trie.Trie, replacementDict *sync.Map, l
 	}
 	err = fsutils.WriteGzPage(gzPagePath, data)
 	if err != nil {
-		panic(err)
 		return err
 	}
 
-	wg.Done()
 	return nil
 }
