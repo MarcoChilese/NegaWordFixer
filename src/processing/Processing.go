@@ -15,9 +15,10 @@ func PerformCorrection(jsMap *[]utils.VarCouple, trie trie.Trie, replacementDict
 	for i, _ := range *jsMap {
 		fmt.Fprint(*logger, (*jsMap)[i].Word + " replaced by ")
 
-		newWord, exists := (*replacementDict).Load((*jsMap)[i].Word)
+		res, exists := (*replacementDict).Load((*jsMap)[i].Word)
 
 		if exists { // if the replacement is already known, then use it and avoid the search on the trie
+			newWord := res.(string)
 			if newWord == (*jsMap)[i].Word {
 				fmt.Fprintln(*logger, "--SAME--")
 			} else {
