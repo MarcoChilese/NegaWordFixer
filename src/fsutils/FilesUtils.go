@@ -171,11 +171,16 @@ func CompressTarGz2(archiveFileName string, dirToCompress string) error {
 	var cmdStderr bytes.Buffer
 	extractionCmd.Stderr = &cmdStderr
 
+	var cmdStdout bytes.Buffer
+	extractionCmd.Stdout = &cmdStdout
+
 	if err := extractionCmd.Run(); err != nil {
 		fmt.Println(err)
 		log.Fatal("Call to external command failed, with the following error stream:\n" + cmdStderr.String())
 		return err
 	}
+
+	fmt.Println(cmdStdout)
 
 	return nil
 }
