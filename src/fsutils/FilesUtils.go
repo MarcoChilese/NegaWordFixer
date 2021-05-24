@@ -48,7 +48,7 @@ func ExtractTarGz(tarpath string) (string, error) {
 
 		switch header.Typeflag {
 		case tar.TypeDir:
-			if err := os.Mkdir(path.Join(tmpdir, header.Name), 0755); err != nil {
+			if err := os.MkdirAll(path.Join(tmpdir, header.Name), 0755); err != nil {
 				log.Fatalf("ExtractTarGz: Mkdir() failed: %s", err.Error())
 			}
 		case tar.TypeReg:
@@ -74,15 +74,16 @@ func ExtractTarGz(tarpath string) (string, error) {
 
 
 func ExtractTarGz2(tarpath string) (string, error) {
-	tmpdir := "tmp"
+	tmpdir := "./tmp"
 	os.RemoveAll(tmpdir)
 
 	err := os.Mkdir(tmpdir, 0755)
 	if err != nil {
 		return "", err
 	}
-	commandArgs := []string{"–xvzf", tarpath, "-C", tmpdir}
-	extractionCmd := exec.Command("tar", commandArgs...)
+
+	commandArgs := []string{tarpath, tmpdir}
+	extractionCmd := exec.Command("./extract.sh", commandArgs...)
 	fmt.Println(extractionCmd.String())
 
 	var cmdStderr bytes.Buffer
@@ -97,6 +98,7 @@ func ExtractTarGz2(tarpath string) (string, error) {
 		log.Fatal("Call to external command failed, with the following error stream:\n"+cmdStderr.String())
 		return tmpdir, err
 	}
+
 
 	return tmpdir, err
 }
