@@ -73,6 +73,7 @@ func main() {
 	verbosePtr := flag.Bool("verbose", false, "Negapedia language")
 	exactFilePtr := flag.String("file", "", "Exact tar.gz to process. If not specified is automatically selected the newest .tar.gz")
 	outFilenamePtr := flag.String("out", "", "Name of the tar.gz output file")
+	dictionaryFilePtr := flag.String("dict", "", "Specific dictionary file for building the Trie")
 	flag.Parse()
 
 	dictLang, err := languageChecker(*langPtr)
@@ -93,7 +94,12 @@ func main() {
 		*outFilenamePtr = path.Join("./out", *outFilenamePtr)
 	}
 
-	pathToDict := path.Join("./dictionary_data/", dictLang+".txt")
+	var pathToDict string
+	if *dictionaryFilePtr == "" {
+		pathToDict = path.Join("./dictionary_data/", dictLang+".txt")
+	} else{
+		pathToDict = *dictionaryFilePtr
+	}
 
 	logger := ioutil.Discard
 	if *verbosePtr {
