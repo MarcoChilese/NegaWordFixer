@@ -90,7 +90,7 @@ func ProcessPage(gzPagePath string, trie trie.Trie, replacementDict *map[string]
 		return err
 	}
 
-	fmt.Println(len(data))
+	fmt.Fprintf(os.Stdout,"%s ", len(data))
 	err = fsutils.WriteGzPage(gzPagePath, data)
 	if err != nil {
 		return err

@@ -233,6 +233,9 @@ func ReadGzPage(gzPagePath string) (string, error) {
 func WriteGzPage(tarPath string, data string) error {
 	//fmt.Println("gzing: ", tarPath)
 	//_ = os.Remove(tarPath)
+
+	fmt.Fprintf(os.Stdout,"%s ", len(data))
+
 	file, err := os.Create(tarPath[:len(tarPath)-3])
 	//defer newGz.Close()
 	if err != nil {
