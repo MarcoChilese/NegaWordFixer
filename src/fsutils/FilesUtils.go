@@ -93,7 +93,7 @@ func ExtractTarGz2(tarpath string) (string, error) {
 
 	if err = extractionCmd.Run(); err != nil {
 		fmt.Println(err)
-		fmt.Println("Call to external command failed, with the following error stream:\n"+cmdStderr.String())
+		log.Fatal("Call to external command failed, with the following error stream:\n"+cmdStderr.String())
 		return tmpdir, err
 	}
 
