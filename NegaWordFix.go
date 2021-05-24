@@ -101,15 +101,11 @@ func main() {
 
 	if err = extractionCmd.Run(); err != nil {
 		fmt.Println(err)
-		log.Fatal("Call to external command failed, with the following error stream:\n"+cmdStderr.String())
+		log.Fatal("Call to external command failed, with the following error stream:\n" + cmdStderr.String())
 
-	fmt.Println("Extraction done in ", time.Now().Sub(start))
+		fmt.Println("Extraction done in ", time.Now().Sub(start))
 
-
-
-
-
-
+	}
 
 
 
