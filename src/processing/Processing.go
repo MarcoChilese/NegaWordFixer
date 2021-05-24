@@ -71,7 +71,7 @@ func replaceJSVariable(pageData string, variableName string, trie trie.Trie, rep
 
 func ProcessPage(gzPagePath string, trie trie.Trie, replacementDict *map[string]string, logger *io.Writer) error {
 	data, err := fsutils.ReadGzPage(gzPagePath)
-	fmt.Print(string (len(data)) + " ")
+	fmt.Print(string (rune(len(data))) + " ")
 
 	if err != nil {
 		return err
