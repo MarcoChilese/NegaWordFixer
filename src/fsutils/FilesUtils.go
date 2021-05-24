@@ -208,16 +208,24 @@ func ReadGzPage(gzPagePath string) (string, error) {
 
 	gz, err := gzip.NewReader(f)
 	if err != nil {
+		log.Fatal(err)
 		return "", err
 	}
 
 	s, err := ioutil.ReadAll(gz)
 	if err != nil {
+		log.Fatal(err)
 		return "nil", err
 	}
 
-	gz.Close()
-	f.Close()
+	err = gz.Close()
+	if err != nil {
+		return "", err
+	}
+	err = f.Close()
+	if err != nil {
+		return "", err
+	}
 
 	return string(s), nil
 }
@@ -225,27 +233,34 @@ func ReadGzPage(gzPagePath string) (string, error) {
 func WriteGzPage(tarPath string, data string) error {
 	//fmt.Println("gzing: ", tarPath)
 	//_ = os.Remove(tarPath)
-	newGz, err := os.Create(tarPath)
+	file, err := os.Create(tarPath[:len(tarPath)-3])
 	//defer newGz.Close()
 	if err != nil {
-		fmt.Println("Error writing page ", tarPath)
+		fmt.Println("Error creating file page ", tarPath)
 		return err
 	}
 
-	writer := gzip.NewWriter(newGz)
-	//defer writer.Close()
-	_, err = writer.Write([]byte(data))
+	_, err = file.Write([]byte(data))
 	if err != nil {
+		fmt.Println("Error writing file page ", tarPath)
 		return err
 	}
 
-	err = writer.Close()
-	if err != nil {
+	file.Close()
+
+	commandArgs := []string{tarPath[:len(tarPath)-3]}
+	extractionCmd := exec.Command("./compressPage.sh", commandArgs...)
+	//fmt.Println("\t" + extractionCmd.String())
+
+	var cmdStderr bytes.Buffer
+	extractionCmd.Stderr = &cmdStderr
+
+	if err := extractionCmd.Run(); err != nil {
+		fmt.Println(err)
+		log.Fatal("Call to external command failed, with the following error stream:\n" + cmdStderr.String())
 		return err
 	}
-	err = newGz.Close()
-	if err != nil {
-		return err
-	}
+
+
 	return err
 }

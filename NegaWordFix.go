@@ -103,7 +103,8 @@ func main() {
 	fmt.Println("--- NegaWordsFixer ---")
 	fmt.Println("Run with config:\n\tLang: " + *langPtr +
 		"\n\tDict: " + pathToDict +
-		"\n\tTar: " + tarPathPtr + "\n\t")
+		"\n\tFile to process: " + tarPathPtr +
+		"\n\tOutput file: " + *outFilenamePtr + "\n\t")
 
 	mytrie, replacementDict := buildTrieAndReplacementDict(pathToDict)
 
