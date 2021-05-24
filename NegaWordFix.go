@@ -1,12 +1,14 @@
 package main
 
 import (
+	"errors"
 	"flag"
 	"fmt"
 	"github.com/marcochilese/Go-Trie"
 	"github.com/negapedia/negawordfixer/src/fsutils"
 	"github.com/negapedia/negawordfixer/src/processing"
 	"io/ioutil"
+	"log"
 	"os"
 	"path"
 	"sync"
@@ -50,14 +52,34 @@ func getNewestFileInDir(dir string) string {
 	return path.Join(dir, newestFile)
 }
 
+func languageChecker(lang string) (string, error) {
+	available_lang := map[string]string{
+		"en":     "en",
+		"simple": "en",
+		"it":     "en",
+		"fr":     "fr",
+		"es":     "es",
+		"de":     "de",
+	}
+
+	if _, available := available_lang[lang]; !available {
+		return "", errors.New("Language " + lang + " not available")
+	}
+	return available_lang[lang], nil
+}
+
 func main() {
 	tarPathPtr := flag.String("tar", "./out", "Path to negapedia-LANG.tar.gz")
 	langPtr := flag.String("lang", "en", "Negapedia language")
 	verbosePtr := flag.Bool("verbose", false, "Negapedia language")
 	flag.Parse()
 
+	dictLang, err := languageChecker(*langPtr)
+	if err != nil {
+		log.Fatal(err)
+	}
 	*tarPathPtr = getNewestFileInDir(*tarPathPtr)
-	pathToDict := path.Join("./dictionary_data/", *langPtr+".txt")
+	pathToDict := path.Join("./dictionary_data/", dictLang+".txt")
 
 	logger := ioutil.Discard
 	if *verbosePtr {
