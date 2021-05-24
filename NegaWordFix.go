@@ -1,17 +1,15 @@
 package main
 
 import (
-	"bytes"
 	"flag"
 	"fmt"
 	"github.com/marcochilese/Go-Trie"
 	"github.com/negapedia/negawordfixer/src/fsutils"
 	"github.com/negapedia/negawordfixer/src/processing"
 	"io/ioutil"
-	"log"
 	"os"
-	"os/exec"
 	"path"
+	"sync"
 	"time"
 )
 
@@ -75,58 +73,36 @@ func main() {
 
 	fmt.Println("Extraction start")
 	start := time.Now()
-	/*tmpDir, err := fsutils.ExtractTarGz2(*tarPathPtr)
+	tmpDir, err := fsutils.ExtractTarGz2(*tarPathPtr)
 	if err != nil {
 		fmt.Println(err)
-	}*/
-
-	tmpDir := "./tmp"
-	os.RemoveAll(tmpDir)
-
-	err := os.Mkdir(tmpDir, 0755)
-	if err != nil {
-		log.Fatal(err)
 	}
-
-	commandArgs := []string{*tarPathPtr, tmpDir}
-	extractionCmd := exec.Command("./extract.sh", commandArgs...)
-	fmt.Println(extractionCmd.String())
-
-	var cmdStderr bytes.Buffer
-	extractionCmd.Stderr = &cmdStderr
-	/*cmd.Dir, err = filepath.Abs(filepath.Join(tmpDir, program))
-	if err != nil {
-		return errors.Wrapf(err, "Unable to convert to absolute path %s", tmpDir)
-	}*/
-
-	if err = extractionCmd.Run(); err != nil {
-		fmt.Println(err)
-		log.Fatal("Call to external command failed, with the following error stream:\n" + cmdStderr.String())
-
-		fmt.Println("Extraction done in ", time.Now().Sub(start))
-
-	}
-
-
-
+	fmt.Println("Extraction done in ", time.Now().Sub(start))
 
 	filesToProcess := fsutils.GetFilesList(tmpDir, false)
 
 	fmt.Println("To process: ", len(filesToProcess))
 	fmt.Println("Processing start")
 	start = time.Now()
-	for _, file := range filesToProcess {
-		err := processing.ProcessPage(file, *mytrie, replacementDict, &logger)
-		if err != nil {
-			os.RemoveAll(tmpDir)
-		}
 
+	wg := sync.WaitGroup{}
+	var m sync.Mutex
+	for _, file := range filesToProcess {
+		wg.Add(1)
+		go func() {
+			err := processing.ProcessPage(file, *mytrie, replacementDict, &logger, &m)
+			if err != nil {
+				os.RemoveAll(tmpDir)
+			}
+			wg.Done()
+		}()
 	}
+	wg.Wait()
 	fmt.Println("Processing done in ", time.Now().Sub(start))
 
 	fmt.Fprintln(logger, "Compression start")
 	start = time.Now()
-	err = fsutils.CompressTarGz(tmpDir, path.Join(*tarPathPtr))
+	err = fsutils.CompressTarGz2(*tarPathPtr, tmpDir)
 	if err != nil {
 		fmt.Println(err)
 	}

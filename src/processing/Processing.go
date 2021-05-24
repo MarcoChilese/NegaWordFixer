@@ -8,13 +8,18 @@ import (
 	trie "github.com/marcochilese/Go-Trie"
 	"io"
 	"strings"
+	"sync"
 )
 
-func PerformoCorrection(jsMap *[]utils.VarCouple, trie trie.Trie, replacementDict *map[string]string, logger *io.Writer) {
+func PerformoCorrection(jsMap *[]utils.VarCouple, trie trie.Trie, replacementDict *map[string]string, logger *io.Writer, m *sync.Mutex) {
 	for i, _ := range *jsMap {
 		fmt.Fprint(*logger, (*jsMap)[i].Word + " replaced by ")
 
-		if newWord, exists := (*replacementDict)[(*jsMap)[i].Word]; exists { // if the replacement is already known, then use it and avoid the search on the trie
+		m.Lock()
+		newWord, exists := (*replacementDict)[(*jsMap)[i].Word]
+		m.Unlock()
+
+		if exists { // if the replacement is already known, then use it and avoid the search on the trie
 			if newWord == (*jsMap)[i].Word {
 				fmt.Fprintln(*logger, "--SAME--")
 			} else {
@@ -37,12 +42,14 @@ func PerformoCorrection(jsMap *[]utils.VarCouple, trie trie.Trie, replacementDic
 				(*jsMap)[i].Word = alternatives[0] // it will be in position 0 since the alternatives are ordered by length
 				fmt.Fprintln(*logger, (*jsMap)[i].Word)
 			}
+			m.Lock()
 			(*replacementDict)[oldWord] = alternatives[0] // store the replacement for the future
+			m.Lock()
 		}
 	}
 }
 
-func replaceJSVariable(pageData string, variableName string, trie trie.Trie, replacementDict *map[string]string, logger *io.Writer) (string, error) {
+func replaceJSVariable(pageData string, variableName string, trie trie.Trie, replacementDict *map[string]string, logger *io.Writer, m *sync.Mutex) (string, error) {
 	if !strings.Contains(pageData, variableName) {
 		return pageData, nil
 	}
@@ -54,7 +61,7 @@ func replaceJSVariable(pageData string, variableName string, trie trie.Trie, rep
 
 	// deal with dictionary_data and do the words correction
 	// call here
-	PerformoCorrection(varMapData, trie, replacementDict, logger)
+	PerformoCorrection(varMapData, trie, replacementDict, logger, m)
 
 	newJsMap := wikipage.GetJSMapFromSlice(varMapData, variableName) // get back JS map format
 
@@ -67,20 +74,20 @@ func replaceJSVariable(pageData string, variableName string, trie trie.Trie, rep
 	return pageData, nil
 }
 
-func ProcessPage(gzPagePath string, trie trie.Trie, replacementDict *map[string]string, logger *io.Writer) error {
+func ProcessPage(gzPagePath string, trie trie.Trie, replacementDict *map[string]string, logger *io.Writer, m *sync.Mutex) error {
 	data, err := fsutils.ReadGzPage(gzPagePath)
 	if err != nil {
 		return err
 	}
-	data, err = replaceJSVariable(data, wikipage.NegaJSVariables().Tfidf, trie, replacementDict, logger)
+	data, err = replaceJSVariable(data, wikipage.NegaJSVariables().Tfidf, trie, replacementDict, logger, m)
 	if err != nil {
 		return err
 	}
-	data, err = replaceJSVariable(data, wikipage.NegaJSVariables().Badw, trie, replacementDict, logger)
+	data, err = replaceJSVariable(data, wikipage.NegaJSVariables().Badw, trie, replacementDict, logger, m)
 	if err != nil {
 		return err
 	}
-	data, err = replaceJSVariable(data, wikipage.NegaJSVariables().Word2Occur, trie, replacementDict, logger)
+	data, err = replaceJSVariable(data, wikipage.NegaJSVariables().Word2Occur, trie, replacementDict, logger, m)
 	if err != nil {
 		return err
 	}

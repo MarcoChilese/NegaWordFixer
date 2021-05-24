@@ -71,36 +71,29 @@ func ExtractTarGz(tarpath string) (string, error) {
 	return tmpdir, nil
 }
 
-
-
 func ExtractTarGz2(tarpath string) (string, error) {
-	tmpdir := "./tmp"
-	os.RemoveAll(tmpdir)
+	tmpDir := "./tmp"
+	os.RemoveAll(tmpDir)
 
-	err := os.Mkdir(tmpdir, 0755)
+	err := os.Mkdir(tmpDir, 0755)
 	if err != nil {
-		return "", err
+		log.Fatal(err)
 	}
 
-	commandArgs := []string{tarpath, tmpdir}
+	commandArgs := []string{tarpath, tmpDir}
 	extractionCmd := exec.Command("./extract.sh", commandArgs...)
-	fmt.Println(extractionCmd.String())
+	fmt.Println("\t" + extractionCmd.String())
 
 	var cmdStderr bytes.Buffer
 	extractionCmd.Stderr = &cmdStderr
-	/*cmd.Dir, err = filepath.Abs(filepath.Join(tmpDir, program))
-	if err != nil {
-		return errors.Wrapf(err, "Unable to convert to absolute path %s", tmpDir)
-	}*/
 
 	if err = extractionCmd.Run(); err != nil {
 		fmt.Println(err)
-		log.Fatal("Call to external command failed, with the following error stream:\n"+cmdStderr.String())
-		return tmpdir, err
+		log.Fatal("Call to external command failed, with the following error stream:\n" + cmdStderr.String())
+		return tmpDir, err
 	}
 
-
-	return tmpdir, err
+	return tmpDir, err
 }
 
 func CompressTarGz(src string, outArchivePath string) error {
@@ -168,6 +161,26 @@ func CompressTarGz(src string, outArchivePath string) error {
 	})
 }
 
+
+
+func CompressTarGz2(archiveFileName string, dirToCompress string) error {
+	commandArgs := []string{archiveFileName, dirToCompress}
+	extractionCmd := exec.Command("./compress.sh", commandArgs...)
+	fmt.Println("\t" + extractionCmd.String())
+
+	var cmdStderr bytes.Buffer
+	extractionCmd.Stderr = &cmdStderr
+
+	if err := extractionCmd.Run(); err != nil {
+		fmt.Println(err)
+		log.Fatal("Call to external command failed, with the following error stream:\n" + cmdStderr.String())
+		return err
+	}
+
+	return nil
+}
+
+
 func GetFilesList(path string, includeDir bool) []string {
 	var files []string
 
@@ -197,7 +210,6 @@ func ReadGzPage(gzPagePath string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-
 
 	s, err := ioutil.ReadAll(gz)
 	if err != nil {
