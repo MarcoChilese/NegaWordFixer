@@ -108,10 +108,9 @@ func main() {
 	start = time.Now()
 
 	wg := sync.WaitGroup{}
-	var m sync.Mutex
 	wg.Add(len(filesToProcess))
 	for _, file := range filesToProcess {
-		go processing.ProcessPage(file, *mytrie, replacementDict, &logger, &m, &wg)
+		go processing.ProcessPage(file, *mytrie, replacementDict, &logger, &wg)
 	}
 	wg.Wait()
 	fmt.Println("Processing done in ", time.Now().Sub(start))
