@@ -87,15 +87,9 @@ func main() {
 
 	wg := sync.WaitGroup{}
 	var m sync.Mutex
+	wg.Add(len(filesToProcess))
 	for _, file := range filesToProcess {
-		wg.Add(1)
-		go func() {
-			err := processing.ProcessPage(file, *mytrie, replacementDict, &logger, &m)
-			if err != nil {
-				os.RemoveAll(tmpDir)
-			}
-			wg.Done()
-		}()
+		go processing.ProcessPage(file, *mytrie, replacementDict, &logger, &m, &wg)
 	}
 	wg.Wait()
 	fmt.Println("Processing done in ", time.Now().Sub(start))

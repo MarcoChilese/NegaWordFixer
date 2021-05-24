@@ -44,7 +44,7 @@ func PerformoCorrection(jsMap *[]utils.VarCouple, trie trie.Trie, replacementDic
 			}
 			m.Lock()
 			(*replacementDict)[oldWord] = alternatives[0] // store the replacement for the future
-			m.Lock()
+			m.Unlock()
 		}
 	}
 }
@@ -74,7 +74,7 @@ func replaceJSVariable(pageData string, variableName string, trie trie.Trie, rep
 	return pageData, nil
 }
 
-func ProcessPage(gzPagePath string, trie trie.Trie, replacementDict *map[string]string, logger *io.Writer, m *sync.Mutex) error {
+func ProcessPage(gzPagePath string, trie trie.Trie, replacementDict *map[string]string, logger *io.Writer, m *sync.Mutex, wg *sync.WaitGroup) error {
 	data, err := fsutils.ReadGzPage(gzPagePath)
 	if err != nil {
 		return err
@@ -95,5 +95,7 @@ func ProcessPage(gzPagePath string, trie trie.Trie, replacementDict *map[string]
 	if err != nil {
 		return err
 	}
+
+	wg.Done()
 	return nil
 }
