@@ -81,7 +81,7 @@ func ExtractTarGz2(tarpath string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	extractionCmd := exec.Command("tar", "–x", tarpath, "–C", "./tmp")
+	extractionCmd := exec.Command("tar", "–x", tarpath)
 	fmt.Println(extractionCmd.String())
 
 	var cmdStderr bytes.Buffer
