@@ -9,7 +9,6 @@ import (
 	"io/ioutil"
 	"os"
 	"path"
-	"strings"
 	"time"
 )
 
@@ -34,9 +33,9 @@ func getNewestFileInDir(dir string) string {
 		if f.Name() == ".DS_Store" {
 			continue
 		}
-		if !strings.Contains(f.Name(), "tar.gz"){
+		/*if !strings.Contains(f.Name(), "tar.gz"){
 			continue
-		}
+		}*/
 		fi, err := os.Stat(dir + f.Name())
 		if err != nil {
 			fmt.Println(err)
@@ -51,7 +50,7 @@ func getNewestFileInDir(dir string) string {
 }
 
 func main() {
-	tarPathPtr := flag.String("tar", "", "Path to negapedia-LANG.tar.gz")
+	tarPathPtr := flag.String("tar", "./out", "Path to negapedia-LANG.tar.gz")
 	langPtr := flag.String("lang", "en", "Negapedia language")
 	verbosePtr := flag.Bool("verbose", false, "Negapedia language")
 	flag.Parse()
@@ -95,7 +94,7 @@ func main() {
 
 	fmt.Fprintln(logger, "Compression start")
 	start = time.Now()
-	err = fsutils.CompressTarGz(tmpDir, path.Join(*tarPathPtr))
+	err = fsutils.CompressTarGz2(tmpDir, path.Join(*tarPathPtr))
 	if err != nil {
 		fmt.Println(err)
 	}

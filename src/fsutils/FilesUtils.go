@@ -2,12 +2,14 @@ package fsutils
 
 import (
 	"archive/tar"
+	"bytes"
 	"compress/gzip"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
 	"os"
+	"os/exec"
 	"path"
 	"path/filepath"
 	"strings"
@@ -22,12 +24,13 @@ func ExtractTarGz(tarpath string) (string, error) {
 
 	uncompressedStream, err := gzip.NewReader(gzipStream)
 	if err != nil {
+		fmt.Println(err)
 		log.Fatal("ExtractTarGz: NewReader failed")
 	}
 	tarReader := tar.NewReader(uncompressedStream)
 
 	tmpdir := "tmp"
-	os.RemoveAll(tmpdir)
+	//os.RemoveAll(tmpdir)
 
 	err = os.Mkdir(tmpdir, 0755)
 	if err != nil {
@@ -66,6 +69,35 @@ func ExtractTarGz(tarpath string) (string, error) {
 		}
 	}
 	return tmpdir, nil
+}
+
+
+
+func ExtractTarGz2(tarpath string) (string, error) {
+	tmpdir := "tmp"
+	//os.RemoveAll(tmpdir)
+
+	err := os.Mkdir(tmpdir, 0755)
+	if err != nil {
+		return "", err
+	}
+	extractionCmd := exec.Command("tar", "–xf", tarpath, "–C", "./tmp")
+	fmt.Println(extractionCmd.String())
+
+	var cmdStderr bytes.Buffer
+	extractionCmd.Stderr = &cmdStderr
+	/*cmd.Dir, err = filepath.Abs(filepath.Join(tmpDir, program))
+	if err != nil {
+		return errors.Wrapf(err, "Unable to convert to absolute path %s", tmpDir)
+	}*/
+
+	if err = extractionCmd.Run(); err != nil {
+		fmt.Println(err)
+		fmt.Println("Call to external command failed, with the following error stream:\n"+cmdStderr.String())
+		return tmpdir, err
+	}
+
+	return tmpdir, err
 }
 
 func CompressTarGz(src string, outArchivePath string) error {
