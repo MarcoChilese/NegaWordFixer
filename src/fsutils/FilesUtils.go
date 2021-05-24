@@ -233,7 +233,8 @@ func ReadGzPage(gzPagePath string) (string, error) {
 func WriteGzPage(tarPath string, data string) error {
 	//fmt.Println("gzing: ", tarPath)
 	//_ = os.Remove(tarPath)
-	fmt.Fprintf(os.Stdout,"%s\n", len(data))
+
+	/*fmt.Fprintf(os.Stdout,"%s\n", len(data))
 	newGz, err := os.Create(tarPath)
 	//defer newGz.Close()
 	if err != nil {
@@ -253,13 +254,14 @@ func WriteGzPage(tarPath string, data string) error {
 	if err != nil {
 		return err
 	}
+	writer.Close()
 
-	defer func(writer *gzip.Writer) {
-		err := writer.Close()
-		if err != nil {
-			log.Fatal(err)
-		}
-	}(writer)
+	err = ioutil.WriteFile(tarPath, []byte(data), 0666)
+	if err != nil {
+		log.Fatal()
+		return err
+	}
+	return err*/
 
-	return err
+	return WriteZip(tarPath, data)
 }
