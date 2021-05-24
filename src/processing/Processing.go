@@ -90,6 +90,7 @@ func ProcessPage(gzPagePath string, trie trie.Trie, replacementDict *sync.Map, l
 	}
 	err = fsutils.WriteGzPage(gzPagePath, data)
 	if err != nil {
+		panic(err)
 		return err
 	}
 
