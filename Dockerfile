@@ -7,7 +7,7 @@ ADD . $GOPATH/src/$PROJECT
 RUN go get $PROJECT/...;
 RUN cd $GOPATH/src/$PROJECT/ && go build -o main && mv main /main
 RUN cp -r $GOPATH/src/$PROJECT/dictionary_data /
-RUN chmod +x $GOPATH/src/$PROJECT/src/fsutils/extract.sh
+RUN chmod +x $GOPATH/src/$PROJECT/extract.sh
 
 WORKDIR /
 # Run the executable
