@@ -15,12 +15,12 @@ import (
 	"time"
 )
 
-func buildTrieAndReplacementDict(pathToDict string) (*trie.Trie, *map[string]string) {
+func buildTrieAndReplacementDict(pathToDict string) (*trie.Trie, *sync.Map) {
 	mytrie := trie.BuildTrieFromDictionary(pathToDict)
 
 	// in replacementDict are stored all the replacements in order to
 	// speedup the replacement process when stored enough history
-	replacementDict := make(map[string]string)
+	var replacementDict sync.Map
 	return mytrie, &replacementDict
 }
 
