@@ -72,7 +72,7 @@ func main() {
 
 	fmt.Println("Extraction start")
 	start := time.Now()
-	tmpDir, err := fsutils.ExtractTarGz(*tarPathPtr)
+	tmpDir, err := fsutils.ExtractTarGz2(*tarPathPtr)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -94,7 +94,7 @@ func main() {
 
 	fmt.Fprintln(logger, "Compression start")
 	start = time.Now()
-	err = fsutils.CompressTarGz2(tmpDir, path.Join(*tarPathPtr))
+	err = fsutils.CompressTarGz(tmpDir, path.Join(*tarPathPtr))
 	if err != nil {
 		fmt.Println(err)
 	}
