@@ -138,7 +138,7 @@ func main() {
 
 	fmt.Fprintln(logger, "Compression start")
 	start = time.Now()
-	err = fsutils.CompressTarGz2(*outFilenamePtr, path.Join(tmpDir, "html"))
+	err = fsutils.CompressTarGz2(*outFilenamePtr, tmpDir)
 	if err != nil {
 		fmt.Println(err)
 	}
