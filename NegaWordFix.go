@@ -56,7 +56,7 @@ func languageChecker(lang string) (string, error) {
 	available_lang := map[string]string{
 		"en":     "en",
 		"simple": "en",
-		"it":     "en",
+		"it":     "it",
 		"fr":     "fr",
 		"es":     "es",
 		"de":     "de",
