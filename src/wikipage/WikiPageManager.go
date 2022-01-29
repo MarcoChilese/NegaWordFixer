@@ -34,8 +34,12 @@ func ParseJSMap(jsmap string) *[]utils.VarCouple {
 			continue
 		}
 		fields := strings.Split(keyvalue, ",")
-
-		variable = append(variable, utils.VarCouple{Word: strings.ToLower(fields[0][2:len(fields[0])-1]), Value: fields[1]})
+		
+		word := ""
+		if len(fields[0]) > 2 {
+			word = strings.ToLower(fields[0][2:len(fields[0])-1])
+		}
+		variable = append(variable, utils.VarCouple{Word: word, Value: fields[1]})
 	}
 
 	return &variable
